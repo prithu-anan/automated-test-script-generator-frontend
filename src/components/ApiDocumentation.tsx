@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Copy } from "lucide-react";
 
 export const ApiDocumentation = () => {
+  const [selectedLanguage, setSelectedLanguage] = useState<"python" | "javascript" | "bash">("python");
+  
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
   };
@@ -52,27 +54,65 @@ console.log(result.data);`;
 
         {/* Language Tabs */}
         <div className="flex gap-2">
-          <Badge variant="default">🐍 Python</Badge>
-          <Badge variant="outline">📋 Javascript</Badge>
-          <Badge variant="outline">🔧 Bash</Badge>
+          <Button
+            size="sm"
+            variant={selectedLanguage === "python" ? "default" : "outline"}
+            onClick={() => setSelectedLanguage("python")}
+            className="flex items-center gap-1"
+          >
+            🐍 Python
+          </Button>
+          <Button
+            size="sm"
+            variant={selectedLanguage === "javascript" ? "default" : "outline"}
+            onClick={() => setSelectedLanguage("javascript")}
+            className="flex items-center gap-1"
+          >
+            📋 Javascript
+          </Button>
+          <Button
+            size="sm"
+            variant={selectedLanguage === "bash" ? "default" : "outline"}
+            onClick={() => setSelectedLanguage("bash")}
+            className="flex items-center gap-1"
+          >
+            🔧 Bash
+          </Button>
         </div>
 
         {/* Installation */}
         <div className="space-y-2">
           <p className="text-sm">
-            <span className="font-medium">1. Install the Python client</span> (
-            <a href="#" className="text-primary underline">docs</a>
-            ) if you don't already have it installed.
+            <span className="font-medium">
+              1. {selectedLanguage === "python" && "Confirm that you have cURL installed on your system."}
+              {selectedLanguage === "javascript" && "Install the Javascript client"}
+              {selectedLanguage === "bash" && "Confirm that you have cURL installed on your system."}
+            </span>{" "}
+            {selectedLanguage !== "bash" && (
+              <>
+                (<a href="#" className="text-primary underline">docs</a>)
+                {selectedLanguage === "python" ? " if you don't already have it installed." : " if you don't already have it installed."}
+              </>
+            )}
           </p>
           <div className="relative">
             <pre className="bg-muted p-3 rounded text-sm overflow-x-auto">
-              <code>$ pip install gradio_client</code>
+              <code>
+                {selectedLanguage === "python" && "$ pip install gradio_client"}
+                {selectedLanguage === "javascript" && "$ npm install @gradio/client"}
+                {selectedLanguage === "bash" && "$ curl --version"}
+              </code>
             </pre>
             <Button
               size="sm"
               variant="ghost"
               className="absolute top-2 right-2"
-              onClick={() => copyToClipboard("pip install gradio_client")}
+              onClick={() => {
+                const installCmd = selectedLanguage === "python" ? "pip install gradio_client" :
+                                 selectedLanguage === "javascript" ? "npm install @gradio/client" :
+                                 "curl --version";
+                copyToClipboard(installCmd);
+              }}
             >
               <Copy className="h-4 w-4" />
             </Button>
@@ -97,13 +137,22 @@ console.log(result.data);`;
 
             <div className="relative">
               <pre className="bg-muted p-3 rounded text-sm overflow-x-auto">
-                <code>{pythonCode}</code>
+                <code>
+                  {selectedLanguage === "python" && pythonCode}
+                  {selectedLanguage === "javascript" && javascriptCode}
+                  {selectedLanguage === "bash" && bashCode}
+                </code>
               </pre>
               <Button
                 size="sm"
                 variant="ghost"
                 className="absolute top-2 right-2"
-                onClick={() => copyToClipboard(pythonCode)}
+                onClick={() => {
+                  const currentCode = selectedLanguage === "python" ? pythonCode :
+                                    selectedLanguage === "javascript" ? javascriptCode :
+                                    bashCode;
+                  copyToClipboard(currentCode);
+                }}
               >
                 <Copy className="h-4 w-4" />
               </Button>

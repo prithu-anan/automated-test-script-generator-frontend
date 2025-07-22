@@ -4,16 +4,13 @@ import { Globe, Settings, Play } from "lucide-react";
 import { AgentSettings } from "./AgentSettings";
 import { BrowserSettings } from "./BrowserSettings";
 import { RunAgent } from "./RunAgent";
-import { SettingsDialog } from "./SettingsDialog";
 import { ApiDocumentation } from "./ApiDocumentation";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { ChevronDown } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 export const TestScriptGenerator = () => {
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isApiOpen, setIsApiOpen] = useState(false);
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="container mx-auto p-6">
@@ -56,36 +53,90 @@ export const TestScriptGenerator = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Footer with collapsible sections */}
-        <div className="mt-8 space-y-4">
-          <Collapsible open={isApiOpen} onOpenChange={setIsApiOpen}>
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2 text-warning">
-                <span>🚀</span>
-                Use via API
-                <ChevronDown className={`w-4 h-4 transition-transform ${isApiOpen ? 'rotate-180' : ''}`} />
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <ApiDocumentation />
-            </CollapsibleContent>
-          </Collapsible>
-
+        {/* Footer */}
+        <div className="mt-8">
           <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" className="flex items-center gap-2 text-warning">
+                  <span>🚀</span>
+                  Use via API
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[800px] max-w-[90vw]">
+                <SheetHeader>
+                  <SheetTitle className="flex items-center gap-2">
+                    <span>🚀</span>
+                    API Documentation
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="mt-6">
+                  <ApiDocumentation />
+                </div>
+              </SheetContent>
+            </Sheet>
+
             <span>Built with Gradio 😊</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsSettingsOpen(true)}
-              className="flex items-center gap-1"
-            >
-              <Settings className="w-4 h-4" />
-              Settings
-            </Button>
+
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[400px] max-w-[90vw]">
+                <SheetHeader>
+                  <SheetTitle className="flex items-center gap-2">
+                    <Settings className="w-4 h-4" />
+                    Settings
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="mt-6 space-y-6">
+                  {/* Display Theme */}
+                  <div className="space-y-2">
+                    <Label className="text-base font-semibold">Display Theme</Label>
+                    <div className="flex gap-2">
+                      <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                        ☀️ Light
+                      </Button>
+                      <Button variant="default" size="sm" className="flex items-center gap-2">
+                        🌙 Dark
+                      </Button>
+                      <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                        💻 System
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Language */}
+                  <div className="space-y-2">
+                    <Label className="text-base font-semibold">Language</Label>
+                    <Select defaultValue="english">
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="english">English</SelectItem>
+                        <SelectItem value="spanish">Spanish</SelectItem>
+                        <SelectItem value="french">French</SelectItem>
+                        <SelectItem value="german">German</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Progressive Web App */}
+                  <div className="space-y-2">
+                    <Label className="text-base font-semibold">Progressive Web App</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Progressive Web App is not enabled for this app. To enable it, start your Gradio app with launch(pwa=True).
+                    </p>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
-
-        <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
       </div>
     </div>
   );
