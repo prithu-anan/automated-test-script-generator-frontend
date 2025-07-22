@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Globe, Settings, Play } from "lucide-react";
@@ -63,7 +64,7 @@ export const TestScriptGenerator = () => {
                   Use via API
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[800px] max-w-[90vw]">
+              <SheetContent side="right" className="w-[33vw] max-w-none">
                 <SheetHeader>
                   <SheetTitle className="flex items-center gap-2">
                     <span>🚀</span>
@@ -85,7 +86,7 @@ export const TestScriptGenerator = () => {
                   Settings
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[400px] max-w-[90vw]">
+              <SheetContent side="right" className="w-[33vw] max-w-none">
                 <SheetHeader>
                   <SheetTitle className="flex items-center gap-2">
                     <Settings className="w-4 h-4" />
