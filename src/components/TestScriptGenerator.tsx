@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 
 export const TestScriptGenerator = () => {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground pb-20">
       <div className="container mx-auto p-6">
         {/* Header */}
         <div className="text-center mb-8">
@@ -55,8 +55,8 @@ export const TestScriptGenerator = () => {
         </Tabs>
 
         {/* Footer */}
-        <div className="mt-8">
-          <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
+        <footer className="fixed bottom-0 left-0 right-0 bg-background border-t border-border">
+          <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground py-4">
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 text-warning">
@@ -64,7 +64,7 @@ export const TestScriptGenerator = () => {
                   Use via API
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[33vw] max-w-none">
+              <SheetContent side="right" className="w-[66vw] max-w-none">
                 <SheetHeader>
                   <SheetTitle className="flex items-center gap-2">
                     <span>🚀</span>
@@ -86,7 +86,7 @@ export const TestScriptGenerator = () => {
                   Settings
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[33vw] max-w-none">
+              <SheetContent side="right" className="w-[66vw] max-w-none">
                 <SheetHeader>
                   <SheetTitle className="flex items-center gap-2">
                     <Settings className="w-4 h-4" />
@@ -137,7 +137,7 @@ export const TestScriptGenerator = () => {
               </SheetContent>
             </Sheet>
           </div>
-        </div>
+        </footer>
       </div>
     </div>
   );
