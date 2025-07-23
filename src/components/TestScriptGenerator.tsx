@@ -64,7 +64,7 @@ export const TestScriptGenerator = () => {
                   Use via API
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[66vw] max-w-none">
+              <SheetContent side="right" className="w-[85vw] max-w-none">
                 <SheetHeader>
                   <SheetTitle className="flex items-center gap-2">
                     <span>🚀</span>
@@ -86,7 +86,7 @@ export const TestScriptGenerator = () => {
                   Settings
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[66vw] max-w-none">
+              <SheetContent side="right" className="w-[85vw] max-w-none">
                 <SheetHeader>
                   <SheetTitle className="flex items-center gap-2">
                     <Settings className="w-4 h-4" />
