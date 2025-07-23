@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 
 export const TestScriptGenerator = () => {
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="container mx-auto p-6">
         {/* Header */}
         <div className="text-center mb-8">
@@ -55,8 +55,8 @@ export const TestScriptGenerator = () => {
         </Tabs>
 
         {/* Footer */}
-        <footer className="fixed bottom-0 left-0 right-0 bg-background border-t border-border">
-          <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground py-4">
+        <div className="mt-8">
+          <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 text-warning">
@@ -137,7 +137,7 @@ export const TestScriptGenerator = () => {
               </SheetContent>
             </Sheet>
           </div>
-        </footer>
+        </div>
       </div>
     </div>
   );
