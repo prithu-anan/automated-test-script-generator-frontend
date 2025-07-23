@@ -158,24 +158,28 @@ export const RunAgent = () => {
 
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-3">
-            <Button variant="secondary" className="flex items-center gap-2">
-              <Square className="w-4 h-4" />
+            <Button variant="outline" size="sm" className="flex items-center gap-1 bg-muted/50 border-muted-foreground/20 text-muted-foreground hover:bg-muted">
+              <Square className="w-3 h-3" />
               Stop
             </Button>
-            <Button variant="secondary" className="flex items-center gap-2">
-              <Pause className="w-4 h-4" />
+            <Button variant="outline" size="sm" className="flex items-center gap-1 bg-muted/50 border-muted-foreground/20 text-muted-foreground hover:bg-muted">
+              <Pause className="w-3 h-3" />
               Pause
             </Button>
-            <Button variant="secondary" className="flex items-center gap-2">
-              <Eraser className="w-4 h-4" />
+            <Button variant="outline" size="sm" className="flex items-center gap-1 bg-muted/50 border-muted-foreground/20 text-muted-foreground hover:bg-muted">
+              <Eraser className="w-3 h-3" />
               Clear
             </Button>
-            <Button variant="secondary" className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
+            <Button variant="outline" size="sm" className="flex items-center gap-1 bg-muted/50 border-muted-foreground/20 text-muted-foreground hover:bg-muted">
+              <FileText className="w-3 h-3" />
               Create Script
             </Button>
-            <Button onClick={handleSubmitTask} className="flex items-center gap-2">
-              <Send className="w-4 h-4" />
+            <Button 
+              onClick={handleSubmitTask} 
+              size="sm"
+              className="flex items-center gap-1 bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
+              <Send className="w-3 h-3" />
               Submit Task
             </Button>
           </div>
