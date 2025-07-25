@@ -1,13 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useSettings } from "@/contexts/SettingsContext";
 
 export const BrowserSettings = () => {
-  const [keepBrowserOpen, setKeepBrowserOpen] = useState(true);
-  const [headlessMode, setHeadlessMode] = useState(false);
-  const [disableSecurity, setDisableSecurity] = useState(true);
+  const { settings, updateBrowserSettings } = useSettings();
 
   return (
     <Card className="w-full">
@@ -21,8 +20,8 @@ export const BrowserSettings = () => {
             <div className="flex items-center space-x-2">
               <Checkbox 
                 id="keep-browser-open" 
-                checked={keepBrowserOpen}
-                onCheckedChange={(checked) => setKeepBrowserOpen(checked === true)}
+                checked={settings.browser.keepBrowserOpen}
+                onCheckedChange={(checked) => updateBrowserSettings({ keepBrowserOpen: checked === true })}
               />
               <Label htmlFor="keep-browser-open" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Keep Browser Open
@@ -38,8 +37,8 @@ export const BrowserSettings = () => {
             <div className="flex items-center space-x-2">
               <Checkbox 
                 id="headless-mode" 
-                checked={headlessMode}
-                onCheckedChange={(checked) => setHeadlessMode(checked === true)}
+                checked={settings.browser.headlessMode}
+                onCheckedChange={(checked) => updateBrowserSettings({ headlessMode: checked === true })}
               />
               <Label htmlFor="headless-mode" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Headless Mode
@@ -55,8 +54,8 @@ export const BrowserSettings = () => {
             <div className="flex items-center space-x-2">
               <Checkbox 
                 id="disable-security" 
-                checked={disableSecurity}
-                onCheckedChange={(checked) => setDisableSecurity(checked === true)}
+                checked={settings.browser.disableSecurity}
+                onCheckedChange={(checked) => updateBrowserSettings({ disableSecurity: checked === true })}
               />
               <Label htmlFor="disable-security" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Disable Security
@@ -73,7 +72,8 @@ export const BrowserSettings = () => {
             <Input 
               id="window-width"
               type="number"
-              defaultValue="1280"
+              value={settings.browser.windowWidth}
+              onChange={(e) => updateBrowserSettings({ windowWidth: parseInt(e.target.value) || 1280 })}
               className="w-full"
             />
           </div>
@@ -85,7 +85,8 @@ export const BrowserSettings = () => {
             <Input 
               id="window-height"
               type="number"
-              defaultValue="720"
+              value={settings.browser.windowHeight}
+              onChange={(e) => updateBrowserSettings({ windowHeight: parseInt(e.target.value) || 720 })}
               className="w-full"
             />
           </div>
