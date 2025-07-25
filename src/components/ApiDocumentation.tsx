@@ -720,7 +720,8 @@ console.log(result.data);`,
               onClick={() => setSelectedLanguage("python")}
               className="flex items-center gap-1"
             >
-              🐍 Python
+              <img src="/python-logo.png" alt="Python" className="w-4 h-4" />
+              Python
             </Button>
             <Button
               size="sm"
@@ -728,7 +729,8 @@ console.log(result.data);`,
               onClick={() => setSelectedLanguage("javascript")}
               className="flex items-center gap-1"
             >
-              📋 Javascript
+              <img src="/js-logo.png" alt="JavaScript" className="w-4 h-4" />
+              Javascript
             </Button>
             <Button
               size="sm"
@@ -736,7 +738,8 @@ console.log(result.data);`,
               onClick={() => setSelectedLanguage("bash")}
               className="flex items-center gap-1"
             >
-              🔧 Bash
+              <img src="/bash-logo.png" alt="Bash" className="w-4 h-4" />
+              Bash
             </Button>
           </div>
 

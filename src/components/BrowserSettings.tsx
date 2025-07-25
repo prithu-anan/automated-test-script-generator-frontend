@@ -1,16 +1,99 @@
-import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertTriangle, Loader2, Save } from "lucide-react";
 import { useSettings } from "@/contexts/SettingsContext";
+import { useTask } from "@/contexts/TaskContext";
+import { updateBrowserSettings as updateBrowserSettingsAPI, BrowserSettings as BrowserSettingsType } from "@/utils/tasks-api";
 
 export const BrowserSettings = () => {
   const { settings, updateBrowserSettings } = useSettings();
+  const { selectedTaskId } = useTask();
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  const handleSaveSettings = async () => {
+    if (!selectedTaskId) {
+      setError("No task selected. Please select a task first.");
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+    setSuccess(false);
+
+    try {
+      const browserSettings: BrowserSettingsType = {
+        browser_headless_mode: settings.browser.headlessMode,
+        disable_security: settings.browser.disableSecurity,
+        window_width: settings.browser.windowWidth,
+        window_height: settings.browser.windowHeight,
+      };
+
+      const result = await updateBrowserSettingsAPI(selectedTaskId, browserSettings);
+
+      if ('error' in result) {
+        setError(result.error);
+      } else {
+        setSuccess(true);
+        setTimeout(() => setSuccess(false), 3000);
+      }
+    } catch (err: any) {
+      setError(err?.message || "Failed to save browser settings");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          Browser Settings
+          {selectedTaskId && (
+            <Button 
+              onClick={handleSaveSettings}
+              disabled={saving}
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  Save Settings
+                </>
+              )}
+            </Button>
+          )}
+        </CardTitle>
+      </CardHeader>
       <CardContent className="p-6">
+        {/* Success/Error Messages */}
+        {success && (
+          <Alert className="mb-4 border-teal-500 text-teal-700 dark:text-teal-300 dark:border-teal-400">
+            <AlertDescription>
+              Browser settings saved successfully!
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Keep Browser Open */}
           <div className="space-y-4">

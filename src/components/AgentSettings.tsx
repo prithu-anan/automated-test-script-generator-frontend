@@ -1,14 +1,23 @@
-import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertTriangle, Loader2, Save } from "lucide-react";
 import { useSettings } from "@/contexts/SettingsContext";
+import { useTask } from "@/contexts/TaskContext";
+import { updateAgentSettings as updateAgentSettingsAPI, AgentSettings as AgentSettingsType } from "@/utils/tasks-api";
 
 export const AgentSettings = () => {
   const { settings, updateAgentSettings } = useSettings();
+  const { selectedTaskId } = useTask();
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
   const llmProviders = [
     "anthropic",
@@ -43,9 +52,85 @@ export const AgentSettings = () => {
 
   const currentModels = modelOptions[settings.agent.llmProvider as keyof typeof modelOptions] || [];
 
+  const handleSaveSettings = async () => {
+    if (!selectedTaskId) {
+      setError("No task selected. Please select a task first.");
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+    setSuccess(false);
+
+    try {
+      const agentSettings: AgentSettingsType = {
+        llm_provider: settings.agent.llmProvider,
+        llm_model: settings.agent.llmModel,
+        temperature: settings.agent.temperature,
+        context_length: settings.agent.ollamaContextLength || 16000,
+        base_url: settings.agent.baseUrl,
+        api_key: settings.agent.apiKey,
+      };
+
+      const result = await updateAgentSettingsAPI(selectedTaskId, agentSettings);
+
+      if ('error' in result) {
+        setError(result.error);
+      } else {
+        setSuccess(true);
+        setTimeout(() => setSuccess(false), 3000);
+      }
+    } catch (err) {
+      setError("Failed to save agent settings");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          Agent Settings
+          {selectedTaskId && (
+            <Button 
+              onClick={handleSaveSettings}
+              disabled={saving}
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  Save Settings
+                </>
+              )}
+            </Button>
+          )}
+        </CardTitle>
+      </CardHeader>
       <CardContent className="p-6">
+        {/* Success/Error Messages */}
+        {success && (
+          <Alert className="mb-4 border-teal-500 text-teal-700 dark:text-teal-300 dark:border-teal-400">
+            <AlertDescription>
+              Agent settings saved successfully!
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
         <div className="space-y-6">
           {/* First Row - LLM Provider and Model Name */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
