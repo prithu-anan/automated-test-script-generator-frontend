@@ -1,41 +1,23 @@
 import React from "react";
-import { TaskList } from "./TaskList";
 import { TaskForm } from "./TaskForm";
 import { useTask } from "@/contexts/TaskContext";
-import { useSettings } from "@/contexts/SettingsContext";
+import { useNavigate } from "react-router-dom";
 
 export const RunAgent = () => {
-  const { selectedTaskId, setSelectedTaskId } = useTask();
-  const { updateAgentSettings, updateBrowserSettings } = useSettings();
-
-  const handleTaskSelect = (taskId: number) => {
-    setSelectedTaskId(taskId);
-  };
+  const { selectedTaskId } = useTask();
+  const navigate = useNavigate();
 
   const handleBackToTasks = () => {
-    setSelectedTaskId(null);
-    
-    // Reset global settings to defaults when going back to task list
-    updateAgentSettings({
-      llmProvider: "openai",
-      llmModel: "gpt-4o",
-      temperature: 0.6,
-      ollamaContextLength: 16000,
-      baseUrl: "",
-      apiKey: "",
-    });
-
-    updateBrowserSettings({
-      headlessMode: true,
-      disableSecurity: true,
-      windowWidth: 1280,
-      windowHeight: 720,
-    });
+    navigate("/");
   };
 
-  if (selectedTaskId) {
-    return <TaskForm taskId={selectedTaskId} onBack={handleBackToTasks} />;
+  if (!selectedTaskId) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">No task selected. Please select a task first.</p>
+      </div>
+    );
   }
 
-  return <TaskList onTaskSelect={handleTaskSelect} />;
+  return <TaskForm taskId={selectedTaskId} onBack={handleBackToTasks} />;
 };

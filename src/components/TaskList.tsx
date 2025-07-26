@@ -243,10 +243,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
 
       {/* Tasks List */}
       <Card>
-        <CardHeader>
-          <CardTitle>Your Tasks</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           {tasks.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <p>No tasks found. Create your first task to get started.</p>

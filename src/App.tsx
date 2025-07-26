@@ -10,6 +10,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import TaskDetail from "./pages/TaskDetail";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <Index />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/task/:taskId" 
+                  element={
+                    <ProtectedRoute>
+                      <TaskDetail />
                     </ProtectedRoute>
                   } 
                 />
