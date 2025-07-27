@@ -58,6 +58,12 @@ export interface TaskInitiate {
   expected_status: string;
 }
 
+export interface TaskResult {
+  result_gif: string;
+  result_json_url: string;
+  task_id: number;
+}
+
 export const getTasks = async (): Promise<TaskSummary[] | { error: string }> => {
   try {
     const res = await axios.get(`${API_BASE_URL}/tasks`, {
@@ -215,6 +221,28 @@ export const initiateTask = async (taskId: number, taskData: TaskInitiate): Prom
   } catch (err) {
     if (err.response) {
       const errorMessage = err.response.data?.detail || err.response.data?.message || "Failed to initiate task";
+      return { error: errorMessage };
+    } else if (err.request) {
+      return { error: "No response from server. Check your connection." };
+    } else {
+      return { error: "An unexpected error occurred." };
+    }
+  }
+};
+
+export const getTaskResult = async (taskId: number): Promise<TaskResult | { error: string }> => {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/results/${taskId}`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (res.status === 200) {
+      return res.data;
+    }
+
+  } catch (err) {
+    if (err.response) {
+      const errorMessage = err.response.data?.detail || err.response.data?.message || "Failed to fetch task result";
       return { error: errorMessage };
     } else if (err.request) {
       return { error: "No response from server. Check your connection." };

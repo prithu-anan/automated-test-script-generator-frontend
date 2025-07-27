@@ -94,8 +94,7 @@ export const BrowserSettings = () => {
           </Alert>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Keep Browser Open */}
+        {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Keep Browser Open between Tasks</Label>
@@ -112,7 +111,6 @@ export const BrowserSettings = () => {
             </div>
           </div>
 
-          {/* Headless Mode */}
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Run browser without GUI</Label>
@@ -129,7 +127,6 @@ export const BrowserSettings = () => {
             </div>
           </div>
 
-          {/* Disable Security */}
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Disable browser security</Label>
@@ -145,7 +142,7 @@ export const BrowserSettings = () => {
               </Label>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           {/* Window Width */}

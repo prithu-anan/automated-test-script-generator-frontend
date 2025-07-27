@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Square, Pause, Eraser, FileText, Send, Download, ArrowLeft, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
-import { 
-  getTask, 
+import {
+  getTask,
   initiateTask,
+  getTaskResult,
   TaskRead,
-  TaskInitiate
+  TaskInitiate,
+  TaskResult
 } from "@/utils/tasks-api";
 import { useSettings } from "@/contexts/SettingsContext";
 
@@ -24,7 +26,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
   const [task, setTask] = useState<TaskRead | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  
+
   // Form fields
   const [taskName, setTaskName] = useState("");
   const [instruction, setInstruction] = useState("");
@@ -33,11 +35,11 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
   const [action, setAction] = useState("");
   const [expectedOutcome, setExpectedOutcome] = useState("");
   const [expectedStatus, setExpectedStatus] = useState("");
-  
+
   // Window dimensions from task
   const [windowWidth, setWindowWidth] = useState(1280);
   const [windowHeight, setWindowHeight] = useState(720);
-  
+
   // UI states
   const [userInput, setUserInput] = useState("");
   const [showWarning, setShowWarning] = useState(false);
@@ -45,6 +47,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [apiResponse, setApiResponse] = useState<any>(null);
+  const [taskResult, setTaskResult] = useState<TaskResult | null>(null);
+  const [resultLoading, setResultLoading] = useState(false);
 
   const { updateAgentSettings, updateBrowserSettings, settings } = useSettings();
 
@@ -62,13 +66,36 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
     fetchTask();
   }, [taskId]);
 
+  // Fetch task result when task status is completed
+  useEffect(() => {
+    const fetchTaskResult = async () => {
+      if (task && task.status === 'completed') {
+        setResultLoading(true);
+        try {
+          const result = await getTaskResult(taskId);
+          if ('error' in result) {
+            console.error("Failed to fetch task result:", result.error);
+          } else {
+            setTaskResult(result);
+          }
+        } catch (err) {
+          console.error("Failed to fetch task result:", err);
+        } finally {
+          setResultLoading(false);
+        }
+      }
+    };
+
+    fetchTaskResult();
+  }, [task?.status, taskId]);
+
   const fetchTask = async () => {
     setLoading(true);
     setError("");
-    
+
     try {
       const result = await getTask(taskId);
-      
+
       if ('error' in result) {
         setError(result.error);
       } else {
@@ -90,7 +117,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
     setAction(taskData.search_input_action || "");
     setExpectedOutcome(taskData.expected_outcome || "");
     setExpectedStatus(taskData.expected_status || "");
-    
+
     // Set window dimensions from task data
     setWindowWidth(taskData.window_width || 1280);
     setWindowHeight(taskData.window_height || 720);
@@ -119,7 +146,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
       setShowWarning(true);
       return;
     }
-    
+
     setShowWarning(false);
     setSubmitError("");
     setSubmitSuccess(false);
@@ -157,6 +184,18 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
     setApiResponse(null);
     setSubmitSuccess(false);
     setSubmitError("");
+  };
+
+  const handleDownloadScript = () => {
+    if (taskResult?.result_json_url) {
+      // Create a temporary anchor element to trigger download
+      const link = document.createElement('a');
+      link.href = taskResult.result_json_url;
+      link.download = `task_${taskId}.py`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   };
 
   // Function to format JSON with syntax highlighting
@@ -208,7 +247,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
       </div>
 
       {/* Agent Interaction */}
-      <div className={`transition-all duration-500 ${isSubmitting ? 'border-2 border-teal-500 rounded-lg p-2 shadow-lg shadow-teal-500/20' : ''}`}>
+      {/* <div className={`transition-all duration-500 ${isSubmitting ? 'border-2 border-teal-500 rounded-lg p-2 shadow-lg shadow-teal-500/20' : ''}`}>
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -217,7 +256,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div 
+            <div
               className="w-full bg-muted/20 rounded border-2 border-dashed border-muted-foreground/20 flex items-center justify-center"
               style={{
                 aspectRatio: `${settings.browser.windowWidth}/${settings.browser.windowHeight}`,
@@ -229,15 +268,15 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
       {/* User Input */}
-      <div className={`transition-all duration-500 ${isSubmitting ? 'border-2 border-teal-500 rounded-lg p-2 shadow-lg shadow-teal-500/20' : ''}`}>
+      {/* <div className={`transition-all duration-500 ${isSubmitting ? 'border-2 border-teal-500 rounded-lg p-2 shadow-lg shadow-teal-500/20' : ''}`}>
         <Card>
           <CardContent className="p-6">
             <div className="space-y-2">
               <Label htmlFor="user-input">User Input</Label>
-              <Input 
+              <Input
                 id="user-input"
                 placeholder="Enter your next task..."
                 value={userInput || ""}
@@ -246,7 +285,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
       {/* Test Case Configuration */}
       <div className={`transition-all duration-500 ${isSubmitting ? 'border-2 border-teal-500 rounded-lg p-2 shadow-lg shadow-teal-500/20' : ''}`}>
@@ -258,7 +297,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
             {/* Task Name */}
             <div className="space-y-2">
               <Label htmlFor="task-name">Task Name</Label>
-              <Input 
+              <Input
                 id="task-name"
                 value={taskName || ""}
                 onChange={(e) => setTaskName(e.target.value)}
@@ -268,7 +307,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
             {/* Instruction */}
             <div className="space-y-2">
               <Label htmlFor="instruction">Instruction</Label>
-              <Textarea 
+              <Textarea
                 id="instruction"
                 value={instruction || ""}
                 onChange={(e) => setInstruction(e.target.value)}
@@ -279,7 +318,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
             {/* Description */}
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
-              <Textarea 
+              <Textarea
                 id="description"
                 value={description || ""}
                 onChange={(e) => setDescription(e.target.value)}
@@ -294,7 +333,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
                 {/* Search Input */}
                 <div className="space-y-2">
                   <Label htmlFor="search-input">Search Input</Label>
-                  <Input 
+                  <Input
                     id="search-input"
                     value={searchInput || ""}
                     onChange={(e) => setSearchInput(e.target.value)}
@@ -304,7 +343,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
                 {/* Action */}
                 <div className="space-y-2">
                   <Label htmlFor="action">Action</Label>
-                  <Input 
+                  <Input
                     id="action"
                     value={action || ""}
                     onChange={(e) => setAction(e.target.value)}
@@ -320,7 +359,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
                 {/* Expected Outcome */}
                 <div className="space-y-2">
                   <Label htmlFor="expected-outcome">Expected Outcome</Label>
-                  <Textarea 
+                  <Textarea
                     id="expected-outcome"
                     value={expectedOutcome || ""}
                     onChange={(e) => setExpectedOutcome(e.target.value)}
@@ -331,7 +370,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
                 {/* Expected Status */}
                 <div className="space-y-2">
                   <Label htmlFor="expected-status">Expected Status</Label>
-                  <Input 
+                  <Input
                     id="expected-status"
                     value={expectedStatus || ""}
                     onChange={(e) => setExpectedStatus(e.target.value)}
@@ -373,42 +412,39 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
 
       {/* Action Buttons */}
       <div className={`grid grid-cols-5 gap-4 w-full transition-all duration-500 ${isSubmitting ? 'border-2 border-teal-500 rounded-lg p-2 shadow-lg shadow-teal-500/20' : ''}`}>
-        <Button 
-          variant="outline" 
-          size="default" 
+        <Button
+          variant="outline"
+          size="default"
           disabled={!isSubmitting}
-          className={`flex items-center gap-2 h-12 ${
-            isSubmitting 
-              ? 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100 dark:bg-red-950 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-900' 
-              : 'bg-muted/50 border-muted-foreground/20 text-muted-foreground'
-          }`}
+          className={`flex items-center gap-2 h-12 ${isSubmitting
+            ? 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100 dark:bg-red-950 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-900'
+            : 'bg-muted/50 border-muted-foreground/20 text-muted-foreground'
+            }`}
         >
           <Square className="w-4 h-4" />
           Stop
         </Button>
-        <Button 
-          variant="outline" 
-          size="default" 
+        <Button
+          variant="outline"
+          size="default"
           disabled={!isSubmitting}
-          className={`flex items-center gap-2 h-12 ${
-            isSubmitting 
-              ? 'bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100 dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-300 dark:hover:bg-yellow-900' 
-              : 'bg-muted/50 border-muted-foreground/20 text-muted-foreground'
-          }`}
+          className={`flex items-center gap-2 h-12 ${isSubmitting
+            ? 'bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100 dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-300 dark:hover:bg-yellow-900'
+            : 'bg-muted/50 border-muted-foreground/20 text-muted-foreground'
+            }`}
         >
           <Pause className="w-4 h-4" />
           Pause
         </Button>
-        <Button 
-          variant="outline" 
-          size="default" 
+        <Button
+          variant="outline"
+          size="default"
           disabled={!apiResponse}
           onClick={handleClear}
-          className={`flex items-center gap-2 h-12 ${
-            apiResponse 
-              ? 'bg-muted/50 border-muted-foreground/20 text-muted-foreground hover:bg-muted' 
-              : 'bg-muted/50 border-muted-foreground/20 text-muted-foreground'
-          }`}
+          className={`flex items-center gap-2 h-12 ${apiResponse
+            ? 'bg-muted/50 border-muted-foreground/20 text-muted-foreground hover:bg-muted'
+            : 'bg-muted/50 border-muted-foreground/20 text-muted-foreground'
+            }`}
         >
           <Eraser className="w-4 h-4" />
           Clear
@@ -417,8 +453,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
           <FileText className="w-4 h-4" />
           Create Script
         </Button>
-        <Button 
-          onClick={handleSubmitTask} 
+        <Button
+          onClick={handleSubmitTask}
           size="default"
           disabled={isSubmitting}
           className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground h-12"
@@ -443,7 +479,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
                   <Label>API Response JSON</Label>
                 </div>
                 <div className="bg-muted/20 rounded border p-4 max-h-96 overflow-auto">
-                  <pre 
+                  <pre
                     className="text-sm text-muted-foreground whitespace-pre-wrap font-mono"
                     dangerouslySetInnerHTML={{ __html: formatJSON(apiResponse) }}
                   />
@@ -468,9 +504,37 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
                 <FileText className="w-4 h-4" />
                 <Label>Task Recording GIF</Label>
               </div>
-              <div className="h-32 bg-muted/20 rounded border flex items-center justify-center">
-                <p className="text-muted-foreground">No recording available</p>
-              </div>
+              {resultLoading ? (
+                <div className="h-32 bg-muted/20 rounded border flex items-center justify-center">
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  <p className="text-muted-foreground">Loading recording...</p>
+                </div>
+              ) : taskResult?.result_gif ? (
+                <div className="bg-muted/20 rounded border p-4">
+                  <img
+                    src={taskResult.result_gif}
+                    alt="Task Recording"
+                    className="w-full h-auto rounded"
+                    onError={(e) => {
+                      const target = e.currentTarget as HTMLImageElement;
+                      const nextDiv = target.nextElementSibling as HTMLDivElement;
+                      target.style.display = 'none';
+                      if (nextDiv) {
+                        nextDiv.style.display = 'flex';
+                      }
+                    }}
+                  />
+                  <div className="h-32 bg-muted/20 rounded border items-center justify-center hidden">
+                    <p className="text-muted-foreground">Failed to load recording</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="h-32 bg-muted/20 rounded border flex items-center justify-center">
+                  <p className="text-muted-foreground">
+                    {task?.status === 'completed' ? 'No recording available' : 'Recording will appear when task is completed'}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Download Script */}
@@ -479,10 +543,22 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
                 <Download className="w-4 h-4" />
                 <Label>Download Script</Label>
               </div>
-              <div className="flex items-center justify-between p-3 bg-muted/20 rounded border">
-                <span className="text-sm">script.py</span>
-                <span className="text-xs text-primary">7.2 KB ↓</span>
-              </div>
+              {taskResult?.result_json_url ? (
+                                 <button
+                   onClick={handleDownloadScript}
+                   className="flex items-center justify-between p-3 bg-muted/20 rounded border hover:bg-muted/30 transition-colors cursor-pointer w-full text-left"
+                 >
+                   <span className="text-sm">task_{taskId}_script.py</span>
+                   <span className="text-xs text-primary">Download ↓</span>
+                 </button>
+              ) : (
+                <div className="flex items-center justify-between p-3 bg-muted/20 rounded border">
+                  <span className="text-sm text-muted-foreground">
+                    {task?.status === 'completed' ? 'No script available' : 'Script will be available when task is completed'}
+                  </span>
+                  <span className="text-xs text-muted-foreground">—</span>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

@@ -19,25 +19,30 @@ export const AgentSettings = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
+  // const llmProviders = [
+  //   "anthropic",
+  //   "openai", 
+  //   "deepseek",
+  //   "google",
+  //   "ollama",
+  //   "azure_openai",
+  //   "mistral",
+  //   "alibaba",
+  //   "moonshot",
+  //   "unbound",
+  //   "siliconflow",
+  //   "ibm"
+  // ];
+
   const llmProviders = [
-    "anthropic",
     "openai", 
-    "deepseek",
-    "google",
     "ollama",
-    "azure_openai",
-    "mistral",
-    "alibaba",
-    "moonshot",
-    "unbound",
-    "siliconflow",
-    "ibm"
   ];
 
   // Model options for each provider (matching the original config)
   const modelOptions = {
     "anthropic": ["claude-3-5-sonnet-20241022", "claude-3-5-sonnet-20240620", "claude-3-opus-20240229"],
-    "openai": ["gpt-4o", "gpt-4", "gpt-3.5-turbo", "o3-mini"],
+    "openai": ["gpt-4o", "gpt-4o-mini"],
     "deepseek": ["deepseek-chat", "deepseek-reasoner"],
     "google": ["gemini-2.0-flash", "gemini-2.0-flash-thinking-exp", "gemini-1.5-flash-latest", "gemini-1.5-flash-8b-latest", "gemini-2.0-flash-thinking-exp-01-21", "gemini-2.0-pro-exp-02-05", "gemini-2.5-pro-preview-03-25", "gemini-2.5-flash-preview-04-17"],
     "ollama": ["qwen2.5:7b", "qwen2.5:14b", "qwen2.5:32b", "qwen2.5-coder:14b", "qwen2.5-coder:32b", "llama2:7b", "deepseek-r1:14b", "deepseek-r1:32b"],
@@ -210,7 +215,7 @@ export const AgentSettings = () => {
             </div>
 
             {/* Use Vision */}
-            <div className="space-y-4">
+            {/* <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Vision Settings</Label>
                 <p className="text-sm text-muted-foreground">Enable Vision(Input highlighted screenshot into LLM)</p>
@@ -225,7 +230,7 @@ export const AgentSettings = () => {
                   Use Vision
                 </Label>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Third Row - Ollama Context Length (only for Ollama) */}
