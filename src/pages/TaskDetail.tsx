@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Globe, Settings, Play, LogOut, ArrowLeft } from "lucide-react";
@@ -6,6 +6,7 @@ import { AgentSettings } from "@/components/AgentSettings";
 import { BrowserSettings } from "@/components/BrowserSettings";
 import { RunAgent } from "@/components/RunAgent";
 import { ApiDocumentation } from "@/components/ApiDocumentation";
+import TaskHeader from "@/components/TaskHeader";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -21,6 +22,7 @@ const TaskDetail = () => {
   const { logout, user } = useAuth();
   const { selectedTaskId, setSelectedTaskId } = useTask();
   const { updateAgentSettings, updateBrowserSettings } = useSettings();
+  const [taskData, setTaskData] = useState<TaskRead | null>(null);
 
   useEffect(() => {
     if (taskId) {
@@ -34,7 +36,10 @@ const TaskDetail = () => {
       const result = await getTask(taskId);
       if (!('error' in result)) {
         const task = result as TaskRead;
-        
+
+        // Set task data
+        setTaskData(task);
+
         // Pre-fill agent settings from task
         updateAgentSettings({
           llmProvider: task.llm_provider || "openai",
@@ -67,6 +72,8 @@ const TaskDetail = () => {
     navigate("/");
   };
 
+
+
   if (!selectedTaskId) {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
@@ -86,7 +93,7 @@ const TaskDetail = () => {
             <h1 className="text-2xl font-bold">🌐 Automated Test Script Generator</h1>
           </div>
           <p className="text-muted-foreground">Generate test scripts for your web applications</p>
-          
+
           {/* Back to Tasks Button */}
           <div className="absolute top-6 left-6">
             <Button
@@ -99,7 +106,7 @@ const TaskDetail = () => {
               <span>Back to Tasks</span>
             </Button>
           </div>
-          
+
           {/* Logout Button */}
           <div className="absolute top-6 right-6 flex items-center gap-3">
             {user && (
@@ -118,6 +125,16 @@ const TaskDetail = () => {
             </Button>
           </div>
         </div>
+
+        {/* Task Header */}
+        {taskData && (
+          <TaskHeader
+            taskName={taskData.task_name}
+            status={taskData.status}
+            createdAt={taskData.created_at}
+            initiatedAt={taskData.initiated_at}
+          />
+        )}
 
         {/* Main Tabs */}
         <Tabs defaultValue="agent-settings" className="w-full">
@@ -145,7 +162,7 @@ const TaskDetail = () => {
           </TabsContent>
 
           <TabsContent value="run-agent">
-            <RunAgent />
+            <RunAgent setTaskData={setTaskData} />
           </TabsContent>
         </Tabs>
 

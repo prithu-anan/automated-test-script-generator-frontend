@@ -2,8 +2,13 @@ import React from "react";
 import { TaskForm } from "./TaskForm";
 import { useTask } from "@/contexts/TaskContext";
 import { useNavigate } from "react-router-dom";
+import { TaskRead } from "@/utils/tasks-api";
 
-export const RunAgent = () => {
+interface RunAgentProps {
+  setTaskData: React.Dispatch<React.SetStateAction<TaskRead | null>>;
+}
+
+export const RunAgent: React.FC<RunAgentProps> = ({ setTaskData }) => {
   const { selectedTaskId } = useTask();
   const navigate = useNavigate();
 
@@ -19,5 +24,5 @@ export const RunAgent = () => {
     );
   }
 
-  return <TaskForm taskId={selectedTaskId} onBack={handleBackToTasks} />;
+  return <TaskForm taskId={selectedTaskId} onBack={handleBackToTasks} setTaskData={setTaskData} />;
 };

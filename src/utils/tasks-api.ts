@@ -29,6 +29,8 @@ export interface TaskRead {
   expected_status: string;
   id: number;
   user_id: number;
+  created_at: string;
+  initiated_at: string;
 }
 
 

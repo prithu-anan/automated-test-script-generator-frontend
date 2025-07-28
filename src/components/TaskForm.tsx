@@ -20,9 +20,10 @@ import { useSettings } from "@/contexts/SettingsContext";
 interface TaskFormProps {
   taskId: number;
   onBack: () => void;
+  setTaskData: React.Dispatch<React.SetStateAction<TaskRead | null>>;
 }
 
-export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
+export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack, setTaskData }) => {
   const [task, setTask] = useState<TaskRead | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -170,6 +171,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
       } else {
         setSubmitSuccess(true);
         setTask(result);
+        setTaskData(result);
         setApiResponse(result);
         console.log("Task initiated successfully:", result);
       }
@@ -544,13 +546,13 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack }) => {
                 <Label>Download Script</Label>
               </div>
               {taskResult?.result_json_url ? (
-                                 <button
-                   onClick={handleDownloadScript}
-                   className="flex items-center justify-between p-3 bg-muted/20 rounded border hover:bg-muted/30 transition-colors cursor-pointer w-full text-left"
-                 >
-                   <span className="text-sm">task_{taskId}_script.py</span>
-                   <span className="text-xs text-primary">Download ↓</span>
-                 </button>
+                <button
+                  onClick={handleDownloadScript}
+                  className="flex items-center justify-between p-3 bg-muted/20 rounded border hover:bg-muted/30 transition-colors cursor-pointer w-full text-left"
+                >
+                  <span className="text-sm">task_{taskId}_script.py</span>
+                  <span className="text-xs text-primary">Download ↓</span>
+                </button>
               ) : (
                 <div className="flex items-center justify-between p-3 bg-muted/20 rounded border">
                   <span className="text-sm text-muted-foreground">
