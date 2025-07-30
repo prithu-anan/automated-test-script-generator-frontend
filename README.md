@@ -4,6 +4,46 @@
 
 **URL**: https://lovable.dev/projects/42639286-316b-4606-bbd6-a84faf643b05
 
+## API Key Encryption Setup
+
+This project includes API key encryption functionality using RSA public/private key pairs. To set up encryption, you'll need to generate a key pair and configure the public key in your environment.
+
+### Generate RSA Key Pair
+
+Use OpenSSL to generate the required keys:
+
+```bash
+# Generate private key (2048-bit RSA)
+openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
+
+# Extract public key from private key
+openssl rsa -pubout -in private_key.pem -out public_key.pem
+```
+
+### Configure Environment
+
+1. Copy the contents of `public_key.pem`
+2. Convert the multi-line public key to a single line format with escaped newlines
+3. Update the `VITE_PUBLIC_KEY` variable in your `.env` file with the formatted key
+4. Keep the `private_key.pem` secure on your backend server for decryption
+
+**Example .env configuration:**
+```bash
+VITE_PUBLIC_KEY="-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqh...your_key_here...\n-----END PUBLIC KEY-----"
+```
+
+**Converting multi-line to single line:**
+- Replace all actual newlines with `\n`
+- Keep the key as one continuous string
+- Ensure proper escaping of the newline characters
+
+### Security Notes
+
+- **Never commit private keys** to version control
+- Store the private key securely on your backend server
+- The public key in `.env` is safe to include in your frontend build
+- API keys entered in the application will be automatically encrypted before transmission
+
 ## How can I edit this code?
 
 There are several ways of editing your application.
