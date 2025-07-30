@@ -16,6 +16,7 @@ import {
   TaskResult
 } from "@/utils/tasks-api";
 import { useSettings } from "@/contexts/SettingsContext";
+import { encryptApiKey } from "@/utils/encryption";
 
 interface TaskFormProps {
   taskId: number;
@@ -163,7 +164,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack, setTaskData 
         search_input_action: action,
         expected_outcome: expectedOutcome,
         expected_status: expectedStatus,
-        ...(apiKey && { api_key: apiKey }),
+        ...(apiKey && { api_key: encryptApiKey(apiKey) }),
       };
 
       const result = await initiateTask(taskId, taskData);
