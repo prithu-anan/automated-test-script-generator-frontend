@@ -36,6 +36,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack, setTaskData 
   const [action, setAction] = useState("");
   const [expectedOutcome, setExpectedOutcome] = useState("");
   const [expectedStatus, setExpectedStatus] = useState("");
+  const [apiKey, setApiKey] = useState("");
 
   // Window dimensions from task
   const [windowWidth, setWindowWidth] = useState(1280);
@@ -162,6 +163,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack, setTaskData 
         search_input_action: action,
         expected_outcome: expectedOutcome,
         expected_status: expectedStatus,
+        ...(apiKey && { api_key: apiKey }),
       };
 
       const result = await initiateTask(taskId, taskData);
@@ -326,6 +328,21 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onBack, setTaskData 
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
               />
+            </div>
+
+            {/* API Key */}
+            <div className="space-y-2">
+              <Label htmlFor="api-key">API Key (Optional)</Label>
+              <Input
+                id="api-key"
+                type="password"
+                placeholder="Enter your API key (optional)"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+              />
+              <p className="text-sm text-muted-foreground">
+                Leave empty to use default settings. This key will be sent to the backend if provided.
+              </p>
             </div>
 
             {/* Input Parameters Section */}

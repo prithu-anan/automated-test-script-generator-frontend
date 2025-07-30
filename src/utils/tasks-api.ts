@@ -58,6 +58,7 @@ export interface TaskInitiate {
   search_input_action: string;
   expected_outcome: string;
   expected_status: string;
+  api_key?: string;
 }
 
 export interface TaskResult {
