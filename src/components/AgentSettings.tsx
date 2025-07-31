@@ -275,7 +275,7 @@ export const AgentSettings = () => {
             </div>
 
             {/* API Key */}
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Label htmlFor="api-key">API Key</Label>
               <p className="text-sm text-muted-foreground">Your API key (leave blank to use .env)</p>
               <Input 
@@ -285,7 +285,7 @@ export const AgentSettings = () => {
                 onChange={(e) => updateAgentSettings({ apiKey: e.target.value })}
                 placeholder="Enter API key"
               />
-            </div>
+            </div> */}
           </div>
         </div>
       </CardContent>
