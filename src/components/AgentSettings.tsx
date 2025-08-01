@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -7,10 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle, Loader2, Save } from "lucide-react";
+import { AlertTriangle, Loader2, Save, Key, Eye, EyeOff } from "lucide-react";
 import { useSettings } from "@/contexts/SettingsContext";
 import { useTask } from "@/contexts/TaskContext";
 import { updateAgentSettings as updateAgentSettingsAPI, AgentSettings as AgentSettingsType } from "@/utils/tasks-api";
+import { encryptApiKey } from "@/utils/encryption";
 
 export const AgentSettings = () => {
   const { settings, updateAgentSettings } = useSettings();
@@ -18,6 +19,15 @@ export const AgentSettings = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  // API Key local storage states
+  const [apiKey, setApiKey] = useState("");
+  const [encryptedApiKey, setEncryptedApiKey] = useState("");
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [showEncryptedKey, setShowEncryptedKey] = useState(false);
+  const [apiKeySaving, setApiKeySaving] = useState(false);
+  const [apiKeySuccess, setApiKeySuccess] = useState(false);
+  const [apiKeyError, setApiKeyError] = useState("");
 
   // const llmProviders = [
   //   "anthropic",
@@ -35,7 +45,7 @@ export const AgentSettings = () => {
   // ];
 
   const llmProviders = [
-    "openai", 
+    "openai",
     "ollama",
   ];
 
@@ -56,6 +66,55 @@ export const AgentSettings = () => {
   };
 
   const currentModels = modelOptions[settings.agent.llmProvider as keyof typeof modelOptions] || [];
+
+  // Load encrypted API key from localStorage on component mount
+  useEffect(() => {
+    const storedEncryptedKey = localStorage.getItem('encrypted_api_key');
+    if (storedEncryptedKey) {
+      setEncryptedApiKey(storedEncryptedKey);
+    }
+  }, []);
+
+  // Auto-hide API key success message after 3 seconds
+  useEffect(() => {
+    if (apiKeySuccess) {
+      const timer = setTimeout(() => {
+        setApiKeySuccess(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [apiKeySuccess]);
+
+  const handleSaveApiKey = async () => {
+    if (!apiKey.trim()) {
+      setApiKeyError("Please enter an API key");
+      return;
+    }
+
+    setApiKeySaving(true);
+    setApiKeyError("");
+    setApiKeySuccess(false);
+
+    try {
+      const encrypted = encryptApiKey(apiKey);
+      localStorage.setItem('encrypted_api_key', encrypted);
+      setEncryptedApiKey(encrypted);
+      setApiKeySuccess(true);
+      setApiKey(""); // Clear the input field after saving
+    } catch (error) {
+      setApiKeyError("Failed to encrypt and save API key");
+    } finally {
+      setApiKeySaving(false);
+    }
+  };
+
+  const handleClearApiKey = () => {
+    localStorage.removeItem('encrypted_api_key');
+    setEncryptedApiKey("");
+    setApiKey("");
+    setApiKeySuccess(false);
+    setApiKeyError("");
+  };
 
   const handleSaveSettings = async () => {
     if (!selectedTaskId) {
@@ -98,7 +157,7 @@ export const AgentSettings = () => {
         <CardTitle className="flex items-center justify-between">
           Agent Settings
           {selectedTaskId && (
-            <Button 
+            <Button
               onClick={handleSaveSettings}
               disabled={saving}
               size="sm"
@@ -143,7 +202,7 @@ export const AgentSettings = () => {
             <div className="space-y-2">
               <Label htmlFor="llm-provider">LLM Provider</Label>
               <p className="text-sm text-muted-foreground">Select LLM provider for LLM</p>
-              <Select 
+              <Select
                 value={settings.agent.llmProvider}
                 onValueChange={(value) => {
                   updateAgentSettings({ llmProvider: value });
@@ -170,8 +229,8 @@ export const AgentSettings = () => {
             {/* LLM Model Name */}
             <div className="space-y-2">
               <Label htmlFor="llm-model">LLM Model Name</Label>
-              <p className="text-sm text-muted-foreground">Select a model in the dropdown options or directly type a custom model name</p>
-              <Select 
+              <p className="text-xs text-muted-foreground">Select a model in the dropdown options or directly type a custom model name</p>
+              <Select
                 value={settings.agent.llmModel}
                 onValueChange={(value) => updateAgentSettings({ llmModel: value })}
               >
@@ -260,32 +319,131 @@ export const AgentSettings = () => {
             </div>
           )}
 
-          {/* Fourth Row - Base URL and API Key */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Fourth Row - Base URL */}
+          <div className="grid grid-cols-1 gap-6">
             {/* Base URL */}
             <div className="space-y-2">
               <Label htmlFor="base-url">Base URL</Label>
               <p className="text-sm text-muted-foreground">API endpoint URL (if required)</p>
-              <Input 
+              <Input
                 id="base-url"
                 value={settings.agent.baseUrl}
                 onChange={(e) => updateAgentSettings({ baseUrl: e.target.value })}
                 placeholder="Enter base URL"
               />
             </div>
+          </div>
 
-            {/* API Key */}
-            {/* <div className="space-y-2">
-              <Label htmlFor="api-key">API Key</Label>
-              <p className="text-sm text-muted-foreground">Your API key (leave blank to use .env)</p>
-              <Input 
-                id="api-key"
-                type="password"
-                value={settings.agent.apiKey}
-                onChange={(e) => updateAgentSettings({ apiKey: e.target.value })}
-                placeholder="Enter API key"
-              />
-            </div> */}
+          {/* API Key Section */}
+          <div className="space-y-4 border-t pt-6">
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2 text-base font-semibold">
+                <Key className="w-4 h-4" />
+                API Key Management
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                API key won't be sent to database, will be encrypted and only saved in local storage
+              </p>
+            </div>
+
+            {/* API Key Success/Error Messages */}
+            {apiKeySuccess && (
+              <Alert className="border-teal-500 text-teal-700 dark:text-teal-300 dark:border-teal-400">
+                <AlertDescription>
+                  API key encrypted and saved to local storage successfully!
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {apiKeyError && (
+              <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>{apiKeyError}</AlertDescription>
+              </Alert>
+            )}
+
+            {/* API Key Input */}
+            <div className="space-y-2">
+              <Label htmlFor="api-key-input">Enter API Key</Label>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Input
+                    id="api-key-input"
+                    type={showApiKey ? "text" : "password"}
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="Enter your API key"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowApiKey(!showApiKey)}
+                  >
+                    {showApiKey ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+                <Button
+                  onClick={handleSaveApiKey}
+                  disabled={apiKeySaving || !apiKey.trim()}
+                  className="flex items-center gap-2"
+                >
+                  {apiKeySaving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      Save API Key
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Show Encrypted API Key */}
+            {encryptedApiKey && (
+              <div className="space-y-2">
+                <Label>Encrypted API Key (Stored in Local Storage)</Label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Input
+                      type={showEncryptedKey ? "text" : "password"}
+                      value={encryptedApiKey}
+                      readOnly
+                      className="bg-muted/50 font-mono text-xs"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowEncryptedKey(!showEncryptedKey)}
+                    >
+                      {showEncryptedKey ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                  <Button
+                    onClick={handleClearApiKey}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    Clear
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
