@@ -47,7 +47,13 @@ export const AgentSettings = () => {
   const llmProviders = [
     "openai",
     "ollama",
+    "openrouter"
   ];
+
+  // Provider-specific warning messages
+  const providerWarnings = {
+    "openrouter": "⚠️ OpenRouter requires an API key to function. Please ensure you have entered your API key below.",
+  };
 
   // Model options for each provider (matching the original config)
   const modelOptions = {
@@ -62,7 +68,8 @@ export const AgentSettings = () => {
     "moonshot": ["moonshot-v1-32k-vision-preview", "moonshot-v1-8k-vision-preview"],
     "unbound": ["gemini-2.0-flash", "gpt-4o-mini", "gpt-4o", "gpt-4.5-preview"],
     "siliconflow": ["deepseek-ai/DeepSeek-R1", "deepseek-ai/DeepSeek-V3", "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B", "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B", "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B", "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B", "deepseek-ai/DeepSeek-V2.5", "deepseek-ai/deepseek-vl2", "Qwen/Qwen2.5-72B-Instruct-128K", "Qwen/Qwen2.5-72B-Instruct", "Qwen/Qwen2.5-32B-Instruct", "Qwen/Qwen2.5-14B-Instruct", "Qwen/Qwen2.5-7B-Instruct", "Qwen/Qwen2.5-Coder-32B-Instruct", "Qwen/Qwen2.5-Coder-7B-Instruct", "Qwen/Qwen2-7B-Instruct", "Qwen/Qwen2-1.5B-Instruct", "Qwen/QwQ-32B-Preview", "Qwen/Qwen2-VL-72B-Instruct", "Qwen/Qwen2.5-VL-32B-Instruct", "Qwen/Qwen2.5-VL-72B-Instruct", "TeleAI/TeleChat2", "THUDM/glm-4-9b-chat", "Vendor-A/Qwen/Qwen2.5-72B-Instruct", "internlm/internlm2_5-7b-chat", "internlm/internlm2_5-20b-chat", "Pro/Qwen/Qwen2.5-7B-Instruct", "Pro/Qwen/Qwen2-7B-Instruct", "Pro/Qwen/Qwen2-1.5B-Instruct", "Pro/THUDM/chatglm3-6b", "Pro/THUDM/glm-4-9b-chat"],
-    "ibm": ["ibm/granite-vision-3.1-2b-preview", "meta-llama/llama-4-maverick-17b-128e-instruct-fp8", "meta-llama/llama-3-2-90b-vision-instruct"]
+    "ibm": ["ibm/granite-vision-3.1-2b-preview", "meta-llama/llama-4-maverick-17b-128e-instruct-fp8", "meta-llama/llama-3-2-90b-vision-instruct"],
+    "openrouter": ["openai/gpt-4o"]
   };
 
   const currentModels = modelOptions[settings.agent.llmProvider as keyof typeof modelOptions] || [];
@@ -247,6 +254,16 @@ export const AgentSettings = () => {
               </Select>
             </div>
           </div>
+
+          {/* Provider Warning */}
+          {providerWarnings[settings.agent.llmProvider as keyof typeof providerWarnings] && (
+            <Alert className="border-amber-500 bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-400">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                {providerWarnings[settings.agent.llmProvider as keyof typeof providerWarnings]}
+              </AlertDescription>
+            </Alert>
+          )}
 
           {/* Second Row - Temperature and Vision Settings with equal width */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
